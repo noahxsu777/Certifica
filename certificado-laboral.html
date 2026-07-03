@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Certificación Laboral — Alliance Network E.I.R.L.</title>
+<style>
+  :root{
+    --navy:#122B45;
+    --navy-deep:#0C1F33;
+    --gold:#B98A2F;
+    --gold-soft:#E9C46A;
+    --ink:#1d2733;
+    --ink-soft:#4a5568;
+    --paper:#ffffff;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ background:#e8eaee; }
+  body{
+    font-family: Georgia, "Liberation Serif", "Times New Roman", serif;
+    color:var(--ink);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Barra de ayuda (no se imprime) ─────────────────────────── */
+  .toolbar{
+    position:sticky; top:0; z-index:50;
+    background:#122B45; color:#fff;
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font-size:13px; letter-spacing:.02em;
+    display:flex; align-items:center; justify-content:center; gap:18px;
+    padding:10px 16px; box-shadow:0 2px 8px rgba(0,0,0,.25);
+  }
+  .toolbar b{ color:#E9C46A; font-weight:600; }
+  .toolbar button{
+    background:#B98A2F; color:#fff; border:none; border-radius:4px;
+    font:600 13px "Helvetica Neue", Arial, sans-serif;
+    padding:8px 18px; cursor:pointer; letter-spacing:.04em;
+  }
+  .toolbar button:hover{ background:#a37a28; }
+
+  /* ── Hoja A4 ────────────────────────────────────────────────── */
+  .sheet{
+    width:210mm; min-height:297mm;
+    margin:24px auto; background:var(--paper);
+    box-shadow:0 6px 30px rgba(15,30,50,.28);
+    position:relative; overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+
+  .band-top{ height:4.5mm; background:var(--navy); }
+  .band-top-accent{ height:1.2mm; background:var(--gold); }
+  .band-bottom{ height:4.5mm; background:var(--navy); margin-top:auto; }
+  .band-bottom-accent{ height:1.2mm; background:var(--gold); }
+
+  /* Marca de agua */
+  .watermark{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; z-index:0;
+  }
+  .watermark span{
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font-weight:700; font-size:120mm; letter-spacing:-.04em;
+    color:rgba(18,43,69,.032); transform:rotate(-14deg); user-select:none;
+  }
+
+  .content{ position:relative; z-index:1; padding:10mm 18mm 7mm; flex:1; display:flex; flex-direction:column; }
+
+  /* ── Encabezado ─────────────────────────────────────────────── */
+  .header{ display:flex; align-items:center; gap:6mm; }
+  .monogram{
+    width:19mm; height:19mm; flex:0 0 auto;
+    background:var(--navy);
+    border:0.6mm solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .monogram span{
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font-weight:700; font-size:8.2mm; letter-spacing:.02em; color:#E9C46A;
+  }
+  .company{ flex:1; }
+  .company h1{
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font-size:15.5pt; font-weight:700; letter-spacing:.14em;
+    color:var(--navy); text-transform:uppercase;
+  }
+  .company .nit{
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font-size:8.4pt; letter-spacing:.22em; color:var(--gold);
+    text-transform:uppercase; margin-top:1.2mm; font-weight:600;
+  }
+  .header-contact{
+    text-align:right;
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font-size:7.6pt; line-height:1.75; color:var(--ink-soft); letter-spacing:.03em;
+  }
+
+  .rule{ margin:6mm 0 0; border-top:0.55mm solid var(--navy); }
+  .rule-thin{ margin:0.9mm 0 0; border-top:0.18mm solid var(--gold); }
+
+  /* ── Título ─────────────────────────────────────────────────── */
+  .doc-title{ text-align:center; margin-top:6mm; }
+  .doc-title h2{
+    display:inline-block;
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font-size:14.5pt; font-weight:700; letter-spacing:.34em;
+    color:var(--navy); text-transform:uppercase;
+    padding-bottom:2.2mm; border-bottom:0.4mm solid var(--gold);
+  }
+  .doc-ref{
+    margin-top:2.6mm;
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font-size:7.6pt; letter-spacing:.18em; color:var(--ink-soft); text-transform:uppercase;
+  }
+
+  /* ── Cuerpo ─────────────────────────────────────────────────── */
+  .meta-row{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin-top:5.5mm; font-size:10.3pt;
+  }
+  .salutation{
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font-weight:700; font-size:10pt; letter-spacing:.14em; color:var(--navy);
+  }
+  .body-text{ margin-top:5mm; font-size:10.3pt; line-height:1.58; text-align:justify; }
+  .body-text p + p, .body-text ul + p{ margin-top:3.6mm; }
+  .body-text strong{ color:var(--navy-deep); }
+
+  ul.functions{ margin:3mm 0 0 5mm; list-style:none; }
+  ul.functions li{
+    position:relative; padding-left:5.5mm; margin-top:2mm;
+    text-align:justify; line-height:1.5;
+  }
+  ul.functions li::before{
+    content:""; position:absolute; left:0; top:2.1mm;
+    width:1.9mm; height:1.9mm; background:var(--gold);
+  }
+
+  /* ── Firma ──────────────────────────────────────────────────── */
+  .signature{ margin-top:6.5mm; }
+  .closing{ font-size:10.3pt; }
+  .sig-block{ margin-top:3mm; width:88mm; }
+  .sig-art{ height:15mm; display:flex; align-items:flex-end; }
+  .sig-art svg{ height:16mm; width:auto; }
+  .sig-line{ border-top:0.3mm solid var(--ink); margin-top:1mm; padding-top:1.8mm; }
+  .sig-name{
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font-weight:700; font-size:10.5pt; color:var(--navy);
+  }
+  .sig-role{
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font-size:8.6pt; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--gold); margin-top:0.8mm; font-weight:600;
+  }
+  .sig-org{ font-size:9pt; color:var(--ink-soft); margin-top:1.6mm; line-height:1.6; }
+
+  /* ── Pie ────────────────────────────────────────────────────── */
+  .footer{ margin-top:auto; padding-top:5mm; }
+  .footer-rule{ border-top:0.18mm solid #c9ced6; padding-top:2.6mm; }
+  .footer p{
+    text-align:center;
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font-size:7.2pt; letter-spacing:.12em; color:var(--ink-soft); text-transform:uppercase;
+    line-height:1.9;
+  }
+
+  /* ── Edición ────────────────────────────────────────────────── */
+  [contenteditable="true"]{ outline:none; border-radius:1px; }
+  [contenteditable="true"]:hover{ box-shadow:0 0 0 1px rgba(185,138,47,.55); }
+  [contenteditable="true"]:focus{ box-shadow:0 0 0 2px rgba(18,43,69,.45); background:rgba(233,196,106,.08); }
+
+  /* ── Impresión ──────────────────────────────────────────────── */
+  @page{ size:A4; margin:0; }
+  @media print{
+    html,body{ background:#fff; }
+    .toolbar{ display:none; }
+    .sheet{ margin:0; box-shadow:none; width:210mm; min-height:297mm; }
+    [contenteditable="true"]:hover, [contenteditable="true"]:focus{ box-shadow:none; background:transparent; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span>✏️ <b>Haz clic sobre cualquier texto para editarlo.</b> Cuando termines, pulsa el botón y elige «Guardar como PDF».</span>
+  <button onclick="window.print()">Descargar PDF</button>
+</div>
+
+<div class="sheet">
+  <div class="band-top"></div>
+  <div class="band-top-accent"></div>
+
+  <div class="watermark"><span>AN</span></div>
+
+  <div class="content">
+
+    <!-- Encabezado -->
+    <div class="header">
+      <div class="monogram"><span contenteditable="true">AN</span></div>
+      <div class="company">
+        <h1 contenteditable="true">Alliance Network E.I.R.L.</h1>
+        <div class="nit" contenteditable="true">NIT: 20613466941</div>
+      </div>
+      <div class="header-contact" contenteditable="true">
+        Monte Olivos 3, Lima — Perú<br>
+        +51 922 052 632<br>
+        Alliance.network.eirl@gmail.com
+      </div>
+    </div>
+    <div class="rule"></div>
+    <div class="rule-thin"></div>
+
+    <!-- Título -->
+    <div class="doc-title">
+      <h2 contenteditable="true">Certificación Laboral</h2>
+      <div class="doc-ref" contenteditable="true">Certificación N.º ALN-CL-2026-0703</div>
+    </div>
+
+    <!-- Fecha y saludo -->
+    <div class="meta-row">
+      <span class="salutation" contenteditable="true">A QUIEN CORRESPONDA</span>
+      <span contenteditable="true">Lima, 03 de julio de 2026</span>
+    </div>
+
+    <!-- Cuerpo -->
+    <div class="body-text">
+      <p contenteditable="true">
+        Por medio de la presente, <strong>ALLIANCE NETWORK E.I.R.L.</strong>, identificada con
+        NIT N.º 20613466941, certifica que la señora <strong>Yurley Dayana Gómez Urrutia</strong>,
+        identificada con cédula de ciudadanía N.º 1.002.971.904, mantiene una relación contractual
+        vigente con nuestra organización desde el año 2022, prestando sus servicios profesionales
+        como <strong>Coordinadora Administrativa — Manager de Agencia TikTok Live</strong>, bajo
+        modalidad remota.
+      </p>
+
+      <p contenteditable="true">Dentro de sus principales funciones se encuentran:</p>
+
+      <ul class="functions" contenteditable="true">
+        <li>Planificación y coordinación de reuniones internas y externas, asegurando el cumplimiento de objetivos y la participación de las áreas involucradas.</li>
+        <li>Generación y gestión de documentos empresariales, tales como informes, actas, oficios y material de soporte para la toma de decisiones.</li>
+        <li>Representación de la empresa en reuniones externas.</li>
+        <li>Optimización de procesos internos, buscando siempre la mejora continua en la gestión administrativa y el uso eficiente de recursos.</li>
+      </ul>
+
+      <p contenteditable="true">
+        Actualmente percibe una remuneración mensual base de <strong>UN MILLÓN SETECIENTOS
+        CINCUENTA MIL NOVECIENTOS CINCO PESOS COLOMBIANOS M/CTE ($1.750.905 COP)</strong>, además
+        de comisiones e incentivos variables derivados de su desempeño y de los resultados
+        obtenidos en las campañas y actividades desarrolladas, por lo que sus ingresos mensuales
+        pueden ser superiores al valor base aquí indicado.
+      </p>
+
+      <p contenteditable="true">
+        A la fecha de expedición de esta certificación, la relación contractual se encuentra
+        vigente y no existe conocimiento de que vaya a finalizar en el corto plazo.
+      </p>
+
+      <p contenteditable="true">
+        La presente certificación se expide a solicitud de la interesada para los fines que
+        estime convenientes.
+      </p>
+    </div>
+
+    <!-- Firma -->
+    <div class="signature">
+      <p class="closing" contenteditable="true">Cordialmente,</p>
+      <div class="sig-block">
+        <div class="sig-art">
+          <svg viewBox="0 0 300 90" xmlns="http://www.w3.org/2000/svg" aria-label="Firma">
+            <path d="M22,62 C36,18 62,10 69,29 C75,44 57,66 39,68 C61,63 92,39 119,37 C101,51 96,64 109,62 C121,60 133,43 141,44 C136,54 139,62 149,58 C161,52 173,37 183,39 C177,50 179,60 191,56 C205,50 217,33 227,36 C241,40 239,53 259,44"
+                  stroke="#1a2f4a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+            <path d="M32,74 C92,66 202,63 272,68"
+                  stroke="#1a2f4a" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.85"/>
+          </svg>
+        </div>
+        <div class="sig-line">
+          <div class="sig-name" contenteditable="true">Carlos Ricardo Morales Jiménez</div>
+          <div class="sig-role" contenteditable="true">Director General</div>
+          <div class="sig-org" contenteditable="true">
+            ALLIANCE NETWORK E.I.R.L. &nbsp;·&nbsp; NIT: 20613466941<br>
+            Tel.: +1 (959) 205 8924 &nbsp;·&nbsp; Alliance.network.eirl@gmail.com
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pie -->
+    <div class="footer">
+      <div class="footer-rule"></div>
+      <p contenteditable="true">
+        Alliance Network E.I.R.L. &nbsp;·&nbsp; NIT 20613466941 &nbsp;·&nbsp; Monte Olivos 3, Lima — Perú<br>
+        +51 922 052 632 &nbsp;·&nbsp; Alliance.network.eirl@gmail.com
+      </p>
+    </div>
+
+  </div>
+
+  <div class="band-bottom-accent"></div>
+  <div class="band-bottom"></div>
+</div>
+
+</body>
+</html>
