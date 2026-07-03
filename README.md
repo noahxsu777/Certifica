@@ -22,4 +22,13 @@ Al importar el repositorio en Vercel, deja *Framework Preset* en **Other** y no 
 2. Haz clic sobre el texto que quieras cambiar (nombre, fecha, salario, funciones, etc.) y escribe directamente.
 3. Pulsa el botón **Descargar PDF** de la barra superior y elige «Guardar como PDF» con márgenes en «Ninguno».
 
-La barra de ayuda superior no aparece en el PDF impreso.
+La barra de ayuda superior y el panel de personalización no aparecen en el PDF impreso.
+
+## Personalizar firma y logo
+
+Justo debajo de la barra superior hay un panel con dos grupos de opciones:
+
+- **Firma**: elige entre tres estilos prediseñados (**Clásica**, **Ejecutiva**, **Ricardo**), pulsa **«Dibujar la mía»** para firmar a mano con el mouse o el dedo dentro de un recuadro, o **«Subir imagen»** para usar una foto/escaneo de una firma real (ideal en PNG con fondo transparente).
+- **Logo**: pulsa **«Subir logo»** para reemplazar el monograma «AN» por el logotipo de la empresa (se ajusta automáticamente al recuadro), o **«Usar iniciales»** para volver al monograma por defecto.
+
+Estas elecciones se guardan en el navegador (localStorage) para que no se pierdan al recargar la página.

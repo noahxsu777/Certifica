@@ -53,6 +53,69 @@
   .toolbar button:hover{ background:#A37A28; }
   .toolbar button:focus-visible{ outline:2px solid var(--gold-soft); outline-offset:2px; }
 
+  /* ── Panel de personalización (no se imprime) ───────────────── */
+  .panel{
+    position:sticky; top:0; z-index:49;
+    background:#1A3554; border-top:1px solid rgba(255,255,255,.08);
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px;
+    padding:9px 16px; box-shadow:0 2px 8px rgba(0,0,0,.22);
+  }
+  .panel-group{ display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .panel-label{
+    font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--gold-soft); margin-right:2px;
+  }
+  .panel-divider{ width:1px; align-self:stretch; background:rgba(255,255,255,.15); margin:0 2px; }
+  .chip{
+    background:rgba(255,255,255,.06); color:#EAEEF3; border:1px solid rgba(255,255,255,.16);
+    border-radius:999px; font:600 11.5px/1 "Helvetica Neue", Arial, sans-serif;
+    padding:7px 13px; cursor:pointer; letter-spacing:.02em; white-space:nowrap;
+  }
+  .chip:hover{ background:rgba(255,255,255,.13); }
+  .chip.active{ background:var(--gold); border-color:var(--gold); color:#fff; }
+  .chip:focus-visible{ outline:2px solid var(--gold-soft); outline-offset:2px; }
+
+  /* ── Modal: dibujar firma (no se imprime) ───────────────────── */
+  .modal-overlay{
+    display:none; position:fixed; inset:0; z-index:100;
+    background:rgba(9,16,26,.62); align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal-box{
+    background:#fff; width:100%; max-width:560px; border-radius:8px;
+    box-shadow:0 20px 60px rgba(0,0,0,.4); overflow:hidden;
+    font-family:"Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+  }
+  .modal-head{
+    background:var(--navy); color:#fff; padding:14px 18px;
+    font-size:13.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .modal-head button{
+    background:none; border:none; color:#EAEEF3; font-size:20px; line-height:1; cursor:pointer; padding:2px 4px;
+  }
+  .modal-body{ padding:16px 18px; }
+  .modal-hint{ font-size:12.5px; color:var(--ink-soft); margin-bottom:10px; }
+  #sigCanvas{
+    width:100%; height:200px; touch-action:none; cursor:crosshair;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 27px, rgba(0,0,0,.05) 27px 28px),
+      #fbfbfa;
+    border:1.5px dashed #C9CED6; border-radius:4px; display:block;
+  }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:14px; }
+  .btn{
+    border:none; border-radius:5px; font:600 12.5px/1 "Helvetica Neue", Arial, sans-serif;
+    padding:9px 16px; cursor:pointer; letter-spacing:.03em;
+  }
+  .btn-ghost{ background:#EDF0F4; color:var(--navy); }
+  .btn-ghost:hover{ background:#E1E6EC; }
+  .btn-solid{ background:var(--gold); color:#fff; }
+  .btn-solid:hover{ background:#A37A28; }
+
+  #logoUpload, #sigUpload{ display:none; }
+
   /* ── Escenario y escalado responsivo ────────────────────────── */
   .stage{ padding:24px 0 48px; }
   .fit{ margin:0 auto; }
@@ -191,6 +254,8 @@
   @media print{
     html, body{ background:#fff; }
     .toolbar{ display:none; }
+    .panel{ display:none; }
+    .modal-overlay{ display:none !important; }
     .stage{ padding:0; }
     .fit{ height:auto !important; }
     .sheet{ margin:0; box-shadow:none; transform:none !important; }
@@ -201,6 +266,43 @@
 <div class="toolbar">
   <span>✏️ <b>Toca cualquier texto para editarlo.</b> Al terminar, pulsa el botón y elige «Guardar como PDF».</span>
   <button type="button" onclick="window.print()">Descargar PDF</button>
+</div>
+
+<div class="panel">
+  <div class="panel-group">
+    <span class="panel-label">Firma</span>
+    <button type="button" class="chip" data-sig="clasica">Clásica</button>
+    <button type="button" class="chip" data-sig="ejecutiva">Ejecutiva</button>
+    <button type="button" class="chip active" data-sig="ricardo">Ricardo</button>
+    <button type="button" class="chip" id="btnDrawSig">Dibujar la mía</button>
+    <button type="button" class="chip" id="btnUploadSig">Subir imagen</button>
+    <input type="file" id="sigUpload" accept="image/*">
+  </div>
+  <div class="panel-divider"></div>
+  <div class="panel-group">
+    <span class="panel-label">Logo</span>
+    <button type="button" class="chip" id="btnUploadLogo">Subir logo</button>
+    <button type="button" class="chip" id="btnResetLogo">Usar iniciales</button>
+    <input type="file" id="logoUpload" accept="image/*">
+  </div>
+</div>
+
+<div class="modal-overlay" id="sigModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span>Dibuja tu firma</span>
+      <button type="button" id="btnCloseModal" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-hint">Usa el mouse o el dedo para firmar dentro del recuadro.</p>
+      <canvas id="sigCanvas" width="600" height="200"></canvas>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="btnClearSig">Borrar</button>
+        <button type="button" class="btn btn-ghost" id="btnCancelSig">Cancelar</button>
+        <button type="button" class="btn btn-solid" id="btnUseSig">Usar esta firma</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="stage">
@@ -215,7 +317,7 @@
 
     <!-- Encabezado -->
     <div class="header">
-      <div class="monogram"><span contenteditable="true" spellcheck="false">AN</span></div>
+      <div class="monogram" id="monogramBox"><span contenteditable="true" spellcheck="false">AN</span></div>
       <div class="company">
         <h1 contenteditable="true" spellcheck="false">Alliance Network E.I.R.L.</h1>
         <div class="nit" contenteditable="true" spellcheck="false">NIT: 20613466941</div>
@@ -284,14 +386,7 @@
     <div class="signature">
       <p class="closing" contenteditable="true" spellcheck="false">Cordialmente,</p>
       <div class="sig-block">
-        <div class="sig-art">
-          <svg viewBox="0 0 300 90" xmlns="http://www.w3.org/2000/svg" aria-label="Firma">
-            <path d="M22,62 C36,18 62,10 69,29 C75,44 57,66 39,68 C61,63 92,39 119,37 C101,51 96,64 109,62 C121,60 133,43 141,44 C136,54 139,62 149,58 C161,52 173,37 183,39 C177,50 179,60 191,56 C205,50 217,33 227,36 C241,40 239,53 259,44"
-                  stroke="#1A2F4A" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-            <path d="M32,74 C92,66 202,63 272,68"
-                  stroke="#1A2F4A" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.85"/>
-          </svg>
-        </div>
+        <div class="sig-art" id="sigArt"></div>
         <div class="sig-line">
           <div class="sig-name" contenteditable="true" spellcheck="false">Carlos Ricardo Morales Jiménez</div>
           <div class="sig-role" contenteditable="true" spellcheck="false">Director General</div>
@@ -327,7 +422,6 @@
     function rescale(){
       var pad = 12;
       var avail = document.documentElement.clientWidth - pad * 2;
-      var prev = sheet.style.transform;
       sheet.style.transform = 'none';
       var natural = sheet.offsetWidth;               /* 210mm en px */
       var naturalH = sheet.offsetHeight;
@@ -340,6 +434,170 @@
     window.addEventListener('load', rescale);
     if (document.readyState !== 'loading') rescale();
     else document.addEventListener('DOMContentLoaded', rescale);
+
+    /* ── Estilos de firma preestablecidos ─────────────────────── */
+    var SIGNATURES = {
+      clasica:
+        '<svg viewBox="0 0 300 90" xmlns="http://www.w3.org/2000/svg" aria-label="Firma clásica">' +
+        '<path d="M22,62 C36,18 62,10 69,29 C75,44 57,66 39,68 C61,63 92,39 119,37 C101,51 96,64 109,62 C121,60 133,43 141,44 C136,54 139,62 149,58 C161,52 173,37 183,39 C177,50 179,60 191,56 C205,50 217,33 227,36 C241,40 239,53 259,44" stroke="#1A2F4A" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
+        '<path d="M32,74 C92,66 202,63 272,68" stroke="#1A2F4A" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.85"/>' +
+        '</svg>',
+      ejecutiva:
+        '<svg viewBox="0 0 300 90" xmlns="http://www.w3.org/2000/svg" aria-label="Firma ejecutiva">' +
+        '<path d="M16,56 L42,17 L48,60 L74,17 C74,17 80,50 92,38 C104,25 114,48 130,33 L246,40" stroke="#1A2F4A" stroke-width="3.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M20,74 L262,62" stroke="#1A2F4A" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+        '</svg>',
+      ricardo:
+        '<svg viewBox="0 0 300 90" xmlns="http://www.w3.org/2000/svg" aria-label="Firma Ricardo">' +
+        '<path d="M18,58 C17,32 21,16 39,18 C55,20 53,37 35,41 C28,43 22,43 19,43 C31,49 47,64 41,69 C56,59 76,35 96,38 C116,41 101,59 116,57 C131,55 141,40 153,42 C149,53 153,60 163,55 C179,47 191,34 203,38 C215,42 209,53 223,49 C239,45 247,30 259,36" stroke="#1A2F4A" stroke-width="2.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M22,76 C90,68 190,64 246,67 C256,68 262,71 255,77 C248,82 243,73 249,70" stroke="#1A2F4A" stroke-width="1.5" fill="none" stroke-linecap="round"/>' +
+        '</svg>'
+    };
+
+    var sigArt = document.getElementById('sigArt');
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.chip[data-sig]'));
+
+    function storageGet(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+    function storageSet(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
+    function storageRemove(k){ try { localStorage.removeItem(k); } catch(e){} }
+
+    function setActiveChip(key){
+      chips.forEach(function(c){ c.classList.toggle('active', c.dataset.sig === key); });
+    }
+
+    function applyPresetSignature(key, persist){
+      sigArt.innerHTML = SIGNATURES[key] || SIGNATURES.ricardo;
+      setActiveChip(key);
+      if (persist !== false){
+        storageSet('cert_sig_type', 'preset:' + key);
+        storageRemove('cert_sig_custom');
+      }
+    }
+
+    function applyCustomSignature(dataUrl, persist){
+      sigArt.innerHTML = '<img src="' + dataUrl + '" alt="Firma" style="height:100%;width:auto;max-width:100%;object-fit:contain;">';
+      chips.forEach(function(c){ c.classList.remove('active'); });
+      if (persist !== false){
+        storageSet('cert_sig_type', 'custom');
+        storageSet('cert_sig_custom', dataUrl);
+      }
+    }
+
+    chips.forEach(function(chip){
+      chip.addEventListener('click', function(){ applyPresetSignature(chip.dataset.sig); });
+    });
+
+    /* Subir imagen de firma */
+    var sigUploadInput = document.getElementById('sigUpload');
+    document.getElementById('btnUploadSig').addEventListener('click', function(){ sigUploadInput.click(); });
+    sigUploadInput.addEventListener('change', function(){
+      var file = sigUploadInput.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e){ applyCustomSignature(e.target.result); };
+      reader.readAsDataURL(file);
+      sigUploadInput.value = '';
+    });
+
+    /* Dibujar firma a mano */
+    var sigModal = document.getElementById('sigModal');
+    var canvas = document.getElementById('sigCanvas');
+    var ctx = canvas.getContext('2d');
+    var drawing = false, lastX = 0, lastY = 0;
+
+    function canvasPoint(evt){
+      var rect = canvas.getBoundingClientRect();
+      var t = evt.touches && evt.touches[0];
+      var clientX = t ? t.clientX : evt.clientX;
+      var clientY = t ? t.clientY : evt.clientY;
+      return {
+        x: (clientX - rect.left) * (canvas.width / rect.width),
+        y: (clientY - rect.top) * (canvas.height / rect.height)
+      };
+    }
+    function startDraw(evt){
+      drawing = true;
+      var p = canvasPoint(evt);
+      lastX = p.x; lastY = p.y;
+      evt.preventDefault();
+    }
+    function moveDraw(evt){
+      if (!drawing) return;
+      var p = canvasPoint(evt);
+      ctx.strokeStyle = '#152A44';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      lastX = p.x; lastY = p.y;
+      evt.preventDefault();
+    }
+    function endDraw(){ drawing = false; }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', moveDraw);
+    window.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive:false });
+    canvas.addEventListener('touchmove', moveDraw, { passive:false });
+    canvas.addEventListener('touchend', endDraw);
+
+    function openSigModal(){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      sigModal.classList.add('open');
+    }
+    function closeSigModal(){ sigModal.classList.remove('open'); }
+
+    document.getElementById('btnDrawSig').addEventListener('click', openSigModal);
+    document.getElementById('btnCloseModal').addEventListener('click', closeSigModal);
+    document.getElementById('btnCancelSig').addEventListener('click', closeSigModal);
+    document.getElementById('btnClearSig').addEventListener('click', function(){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+    document.getElementById('btnUseSig').addEventListener('click', function(){
+      applyCustomSignature(canvas.toDataURL('image/png'));
+      closeSigModal();
+    });
+    sigModal.addEventListener('click', function(e){ if (e.target === sigModal) closeSigModal(); });
+
+    /* ── Logo ──────────────────────────────────────────────────── */
+    var monogramBox = document.getElementById('monogramBox');
+    var DEFAULT_MONOGRAM = monogramBox.innerHTML;
+    var logoUploadInput = document.getElementById('logoUpload');
+    document.getElementById('btnUploadLogo').addEventListener('click', function(){ logoUploadInput.click(); });
+    logoUploadInput.addEventListener('change', function(){
+      var file = logoUploadInput.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e){ applyLogo(e.target.result); };
+      reader.readAsDataURL(file);
+      logoUploadInput.value = '';
+    });
+    function applyLogo(dataUrl, persist){
+      monogramBox.innerHTML = '<img src="' + dataUrl + '" alt="Logo" style="width:100%;height:100%;object-fit:contain;padding:1.5mm;">';
+      if (persist !== false) storageSet('cert_logo', dataUrl);
+    }
+    document.getElementById('btnResetLogo').addEventListener('click', function(){
+      monogramBox.innerHTML = DEFAULT_MONOGRAM;
+      storageRemove('cert_logo');
+    });
+
+    /* ── Restaurar preferencias guardadas ─────────────────────── */
+    var savedLogo = storageGet('cert_logo');
+    if (savedLogo) applyLogo(savedLogo, false);
+
+    var savedSigType = storageGet('cert_sig_type');
+    if (savedSigType === 'custom' && storageGet('cert_sig_custom')){
+      applyCustomSignature(storageGet('cert_sig_custom'), false);
+    } else if (savedSigType && savedSigType.indexOf('preset:') === 0){
+      applyPresetSignature(savedSigType.slice(7), false);
+    } else {
+      applyPresetSignature('ricardo', false);
+    }
+
+    rescale();
   })();
 </script>
 
